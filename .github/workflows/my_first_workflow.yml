@@ -1,0 +1,38 @@
+name: Run Selenium Scraper
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  selenium-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies (Chromium)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser chromium-chromedriver
+          # Confirm installed
+          chromium-browser --version || true
+          chromedriver --version || true
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run scraper
+        env:
+          # If your script uses CHROME_BIN, on ubuntu it is /usr/bin/chromium-browser
+          CHROME_BIN: /usr/bin/chromium-browser
+        run: |
+          python esim_holafly.py
