@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install Chrome
       run: |
@@ -29,5 +31,15 @@ jobs:
       run: |
         pip install selenium webdriver-manager
 
-    - name: Run script
+    - name: Run Selenium script
       run: python esim_holafly.py
+
+    - name: Commit CSV output to repo
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add product_data.csv
+        git commit -m "Add latest product_data.csv [skip ci]" || echo "No changes to commit"
+
+    - name: Push changes
+      run: git push
