@@ -1,4 +1,4 @@
-name: Run Selenium Scraper
+name: Run Selenium Script
 
 on:
   push:
@@ -6,33 +6,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  selenium-run:
+  selenium-job:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget unzip
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-      - name: Install system dependencies (Chromium)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser chromium-chromedriver
-          # Confirm installed
-          chromium-browser --version || true
-          chromedriver --version || true
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
 
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        pip install selenium webdriver-manager
 
-      - name: Run scraper
-        env:
-          # If your script uses CHROME_BIN, on ubuntu it is /usr/bin/chromium-browser
-          CHROME_BIN: /usr/bin/chromium-browser
-        run: |
-          python esim_holafly.py
+    - name: Run script
+      run: python esim_holafly.py
